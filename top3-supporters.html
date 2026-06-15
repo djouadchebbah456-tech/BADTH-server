@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>Top 3 Supporters - عماد قبارة</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: #000;
+    overflow: hidden;
+    font-family: 'Tajawal', sans-serif;
+  }
+
+  .bg {
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 50% 40%, #1a1200 0%, #0a0800 50%, #000 100%);
+    animation: fadeIn 1s ease forwards;
+  }
+
+  .particles { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+  .particle {
+    position: absolute; border-radius: 50%; opacity: 0;
+    animation: floatUp linear infinite;
+  }
+
+  .line-top, .line-bottom {
+    position: fixed; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #c9a84c, #fff8dc, #c9a84c, transparent);
+    transform: scaleX(0);
+    animation: expandLine 1.2s ease forwards 0.5s;
+  }
+  .line-top { top: 0; }
+  .line-bottom { bottom: 0; }
+
+  .scene {
+    position: relative; z-index: 10;
+    width: 100%; height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 20px;
+    gap: 0;
+  }
+
+  .big-crown {
+    font-size: clamp(60px, 8vw, 100px);
+    opacity: 0;
+    transform: translateY(-60px) scale(0.3);
+    animation: crownDrop 1s cubic-bezier(0.34,1.56,0.64,1) forwards 0.8s;
+    filter: drop-shadow(0 0 30px #c9a84c) drop-shadow(0 0 60px #c9a84c88);
+    margin-bottom: 10px;
+  }
+
+  .title-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: clamp(20px, 4vh, 50px);
+  }
+  .title-sub {
+    font-size: clamp(13px, 1.5vw, 20px); font-weight: 300; letter-spacing: 8px;
+    color: #8a7340; opacity: 0;
+    animation: riseIn 0.7s ease forwards 1.4s;
+  }
+  .title-main {
+    font-size: clamp(32px, 5vw, 58px); font-weight: 900;
+    background: linear-gradient(135deg, #b8860b, #f5d77e, #ffd700, #c9a84c);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0;
+    animation: riseIn 0.8s ease forwards 1.6s;
+    filter: drop-shadow(0 0 20px #c9a84c55);
+  }
+  .title-divider {
+    width: 0; height: 1px; margin-top: 10px;
+    background: linear-gradient(90deg, transparent, #c9a84c, #f5d77e, #c9a84c, transparent);
+    animation: expandDiv 0.8s ease forwards 2s;
+  }
+
+  .cards {
+    display: flex; flex-direction: column;
+    align-items: center;
+    gap: clamp(14px, 2vh, 28px);
+    width: 100%;
+  }
+
+  .card {
+    position: relative;
+    width: min(860px, 92%);
+    display: flex; align-items: center;
+    gap: 16px;
+    padding: clamp(16px, 2.5vh, 28px) clamp(16px, 3vw, 36px);
+    opacity: 0;
+    border-radius: 4px;
+  }
+
+  .card.rank-1 {
+    width: min(900px, 96%);
+    transform: translateX(80px);
+    animation: slideIn 0.9s cubic-bezier(0.34,1.2,0.64,1) forwards 2.2s;
+    background: linear-gradient(135deg, #1a1200ee, #2a1f00ee);
+    border: 1px solid #c9a84c66;
+    box-shadow: 0 0 40px #c9a84c22, inset 0 0 60px #c9a84c08;
+  }
+  .card.rank-2 {
+    transform: translateX(-80px);
+    animation: slideInLeft 0.9s cubic-bezier(0.34,1.2,0.64,1) forwards 2.9s;
+    background: linear-gradient(135deg, #111100ee, #1e1800ee);
+    border: 1px solid #c9a84c44;
+  }
+  .card.rank-3 {
+    transform: translateX(80px);
+    animation: slideIn 0.9s cubic-bezier(0.34,1.2,0.64,1) forwards 3.5s;
+    background: linear-gradient(135deg, #0e0e0eee, #181500ee);
+    border: 1px solid #c9a84c22;
+  }
+
+  .rank-num {
+    font-size: clamp(40px, 6vw, 72px); font-weight: 900; line-height: 1;
+    min-width: 60px; text-align: center;
+  }
+  .rank-1 .rank-num {
+    background: linear-gradient(180deg, #fff8dc, #ffd700, #c9a84c);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; filter: drop-shadow(0 0 15px #ffd700);
+  }
+  .rank-2 .rank-num {
+    background: linear-gradient(180deg, #e8e8e8, #c0c0c0, #a0a0a0);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .rank-3 .rank-num {
+    background: linear-gradient(180deg, #d4955a, #cd7f32, #a0522d);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .rank-icon { font-size: clamp(28px, 4vw, 42px); }
+
+  .user-info { flex: 1; }
+  .username {
+    font-size: clamp(20px, 3vw, 36px); font-weight: 700;
+    color: #f5d77e;
+  }
+  .rank-1 .username { font-size: clamp(24px, 3.5vw, 42px); color: #ffd700; }
+  .user-label {
+    font-size: clamp(11px, 1.2vw, 16px); font-weight: 300;
+    color: #6b5a2a; letter-spacing: 3px; margin-top: 4px;
+  }
+
+  .gifts-count { text-align: center; }
+  .gifts-num {
+    font-size: clamp(24px, 3.5vw, 40px); font-weight: 900;
+    background: linear-gradient(135deg, #c9a84c, #f5d77e);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; line-height: 1;
+  }
+  .rank-1 .gifts-num { font-size: clamp(28px, 4vw, 48px); }
+  .gifts-label { font-size: clamp(11px, 1.2vw, 14px); color: #6b5a2a; letter-spacing: 2px; }
+
+  .vline {
+    width: 1px; height: 50px;
+    background: linear-gradient(180deg, transparent, #c9a84c55, transparent);
+    flex-shrink: 0;
+  }
+
+  .footer-text {
+    margin-top: clamp(20px, 4vh, 50px);
+    font-size: clamp(13px, 1.5vw, 18px); font-weight: 300;
+    color: #4a3d1a; letter-spacing: 6px;
+    opacity: 0;
+    animation: riseIn 0.7s ease forwards 4.2s;
+  }
+
+  @keyframes fadeIn { to { opacity: 1; } }
+  @keyframes expandLine { to { transform: scaleX(1); } }
+  @keyframes expandDiv { to { width: min(400px, 80%); } }
+  @keyframes crownDrop { to { opacity:1; transform: translateY(0) scale(1); } }
+  @keyframes riseIn { to { opacity:1; transform: translateY(0); } }
+  @keyframes slideIn { to { opacity:1; transform: translateX(0); } }
+  @keyframes slideInLeft { to { opacity:1; transform: translateX(0); } }
+  @keyframes floatUp {
+    0% { transform: translateY(100vh); opacity:0; }
+    10% { opacity: 0.7; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-100px); opacity:0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="particles" id="particles"></div>
+<div class="line-top"></div>
+<div class="line-bottom"></div>
+
+<div class="scene">
+  <div class="big-crown">🏆</div>
+
+  <div class="title-wrap">
+    <div class="title-sub">TONIGHT'S</div>
+    <div class="title-main">أفضل 3 داعمين</div>
+    <div class="title-divider"></div>
+  </div>
+
+  <div class="cards">
+    <div class="card rank-1">
+      <div class="rank-num">1</div>
+      <div class="vline"></div>
+      <div class="rank-icon">👑</div>
+      <div class="user-info">
+        <div class="username">اسم المشجع الأول</div>
+        <div class="user-label">TOP SUPPORTER • الداعم الأول</div>
+      </div>
+      <div class="gifts-count">
+        <div class="gifts-num">🦁 24</div>
+        <div class="gifts-label">هدية</div>
+      </div>
+    </div>
+
+    <div class="card rank-2">
+      <div class="rank-num">2</div>
+      <div class="vline"></div>
+      <div class="rank-icon">🥈</div>
+      <div class="user-info">
+        <div class="username">اسم المشجع الثاني</div>
+        <div class="user-label">SILVER SUPPORTER</div>
+      </div>
+      <div class="gifts-count">
+        <div class="gifts-num">💎 16</div>
+        <div class="gifts-label">هدية</div>
+      </div>
+    </div>
+
+    <div class="card rank-3">
+      <div class="rank-num">3</div>
+      <div class="vline"></div>
+      <div class="rank-icon">🥉</div>
+      <div class="user-info">
+        <div class="username">اسم المشجع الثالث</div>
+        <div class="user-label">BRONZE SUPPORTER</div>
+      </div>
+      <div class="gifts-count">
+        <div class="gifts-num">🌹 9</div>
+        <div class="gifts-label">هدية</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-text">شكراً لدعمكم • عماد قبارة</div>
+</div>
+
+<script>
+  const cont = document.getElementById('particles');
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 1;
+    p.style.cssText = `
+      left: ${Math.random() * 100}%;
+      width: ${size}px; height: ${size}px;
+      background: ${Math.random() > 0.5 ? '#c9a84c' : '#f5d77e'};
+      animation-duration: ${Math.random() * 8 + 6}s;
+      animation-delay: ${Math.random() * 5}s;
+    `;
+    cont.appendChild(p);
+  }
+</script>
+</body>
+</html>
