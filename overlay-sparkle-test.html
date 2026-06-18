@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>مؤثر تجريبي: بريق متساقط</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent; /* مهم جدًا: خلفية شفافة حتى يظهر فقط البريق في OBS */
+  }
+
+  #stage {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .spark {
+    position: absolute;
+    top: -30px;
+    will-change: transform, opacity;
+  }
+
+  @keyframes fall {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg) scale(var(--scale)); opacity: 0; }
+    8%   { opacity: 1; }
+    85%  { opacity: 1; }
+    100% { transform: translateY(110vh) translateX(var(--drift)) rotate(var(--spin)) scale(var(--scale)); opacity: 0; }
+  }
+
+  .spark.active {
+    animation: fall var(--dur) linear forwards;
+  }
+
+  /* مؤشر تشخيصي صغير، يمكن حذفه بأمان أي وقت */
+  #status {
+    position: fixed;
+    bottom: 8px;
+    inset-inline-start: 8px;
+    font-family: monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+  }
+</style>
+</head>
+<body>
+
+  <div id="stage"></div>
+  <div id="status">بريق تلقائي يعمل — اضغط T لدفعة إضافية</div>
+
+  <script>
+    const stage = document.getElementById("stage");
+
+    // أشكال متنوعة لإحساس بريق طبيعي وغير متكرر
+    const shapes = ["✦", "✧", "✨", "⭐"];
+    const colors = ["#F2B84B", "#FFE9B0", "#FFFFFF", "#8B5CF6"];
+
+    function spawnSpark() {
+      const spark = document.createElement("div");
+      spark.className = "spark";
+      spark.textContent = shapes[Math.floor(Math.random() * shapes.length)];
+
+      const size = 14 + Math.random() * 22; // حجم متنوع
+      const startX = Math.random() * 100;   // موضع أفقي عشوائي
+      const drift = (Math.random() * 140 - 70) + "px";
+      const spin = (Math.random() * 360 - 180) + "deg";
+      const dur = (3 + Math.random() * 2.5) + "s";
+      const scale = (0.6 + Math.random() * 0.8).toFixed(2);
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      spark.style.left = startX + "%";
+      spark.style.fontSize = size + "px";
+      spark.style.color = color;
+      spark.style.filter = `drop-shadow(0 0 6px ${color})`;
+      spark.style.setProperty("--drift", drift);
+      spark.style.setProperty("--spin", spin);
+      spark.style.setProperty("--dur", dur);
+      spark.style.setProperty("--scale", scale);
+
+      stage.appendChild(spark);
+      requestAnimationFrame(() => spark.classList.add("active"));
+
+      // تنظيف العنصر بعد انتهاء الأنيميشن لتجنب تراكم العناصر في الذاكرة
+      setTimeout(() => spark.remove(), 6000);
+    }
+
+    // ----------------------------------------------------------
+    // تشغيل تلقائي بحلقة مستمرة: بريق خفيف ومستمر طوال وقت فتح الصفحة
+    // ----------------------------------------------------------
+    function startAmbientLoop() {
+      setInterval(() => {
+        spawnSpark();
+      }, 350); // كل 350ms نجم واحد، يعطي إحساس بريق متناثر بدون ازدحام
+    }
+
+    startAmbientLoop();
+
+    // ----------------------------------------------------------
+    // تشغيل يدوي إضافي: دفعة بريق أقوى عند الضغط على T
+    // مفيد للتجربة الفورية بدون انتظار، أو لمحاكاة لحظة هدية
+    // ----------------------------------------------------------
+    function burst() {
+      for (let i = 0; i < 25; i++) {
+        setTimeout(() => spawnSpark(), i * 40);
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "t") burst();
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>مؤثر: وردة متطايرة</title>
+<style>
+  /* خلفية شفافة تمامًا لأن هذا Browser Source في OBS، لا نريد أي لون خلفية */
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  #stage {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .petal {
+    position: absolute;
+    bottom: -60px;
+    font-size: 38px;
+    opacity: 0;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 0 8px rgba(242,184,75,0.7));
+  }
+
+  @keyframes floatUp {
+    0%   { transform: translateY(0) translateX(0) rotate(0deg) scale(0.6); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translateY(-110vh) translateX(var(--drift)) rotate(var(--spin)); opacity: 0; }
+  }
+
+  .petal.active {
+    animation: floatUp var(--dur) ease-out forwards;
+  }
+
+  /* مؤشر تشخيصي صغير يظهر فقط محليًا للتأكد من حالة الاتصال أثناء الإعداد، يمكن حذفه لاحقًا */
+  #status {
+    position: fixed;
+    bottom: 8px;
+    insetInlineStart: 8px;
+    font-family: monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.35);
+  }
+</style>
+</head>
+<body>
+
+  <div id="stage"></div>
+  <div id="status">جاري الاتصال بالسيرفر...</div>
+
+  <script>
+    // ============================================================
+    // عنوان السيرفر: غيّره لرابط Render الحقيقي بعد النشر
+    // مثال: https://your-app-name.onrender.com
+    // ============================================================
+    const SERVER_URL = "https://badth-server.onrender.com"; // عدّل هذا السطر
+    const WS_URL = SERVER_URL.replace("https://", "wss://").replace("http://", "ws://") + "/ws";
+
+    const statusEl = document.getElementById("status");
+    const stage = document.getElementById("stage");
+
+    let ws;
+
+    function connect() {
+      ws = new WebSocket(WS_URL);
+
+      ws.onopen = () => {
+        statusEl.textContent = "متصل بالسيرفر ✅";
+      };
+
+      ws.onclose = () => {
+        statusEl.textContent = "انقطع الاتصال، إعادة المحاولة...";
+        setTimeout(connect, 3000); // إعادة الاتصال تلقائيًا إذا انقطع
+      };
+
+      ws.onerror = () => {
+        statusEl.textContent = "خطأ في الاتصال";
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        // هذا المؤثر يستجيب فقط لأوامر تخصه (overlayId = "ov_rose")
+        if (data.type === "TRIGGER_OVERLAY" && data.overlayId === "ov_rose") {
+          playRoseEffect();
+        }
+      };
+    }
+
+    function playRoseEffect() {
+      // إنشاء عدة بتلات وردة تتطاير بشكل عشوائي قليلاً لإحساس طبيعي
+      const petalCount = 14;
+      for (let i = 0; i < petalCount; i++) {
+        setTimeout(() => spawnPetal(), i * 80);
+      }
+    }
+
+    function spawnPetal() {
+      const petal = document.createElement("div");
+      petal.className = "petal";
+      petal.textContent = "🌹";
+
+      const startX = 20 + Math.random() * 60; // نسبة من عرض الشاشة
+      const drift = (Math.random() * 200 - 100) + "px";
+      const spin = (Math.random() * 360 - 180) + "deg";
+      const dur = (2.5 + Math.random() * 1.5) + "s";
+
+      petal.style.left = startX + "%";
+      petal.style.setProperty("--drift", drift);
+      petal.style.setProperty("--spin", spin);
+      petal.style.setProperty("--dur", dur);
+
+      stage.appendChild(petal);
+      requestAnimationFrame(() => petal.classList.add("active"));
+
+      // تنظيف العنصر من DOM بعد انتهاء الأنيميشن لتجنب تراكم العناصر
+      setTimeout(() => petal.remove(), 4500);
+    }
+
+    connect();
+
+    // زر اختباري محلي: اضغط مفتاح "T" على لوحة المفاتيح لتجربة المؤثر بدون انتظار هدية حقيقية
+    document.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() === "t") playRoseEffect();
+    });
+  </script>
+
+</body>
+</html>
