@@ -10,6 +10,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
 const { WebcastPushConnection } = require("tiktok-live-connector");
 const { WebSocketServer } = require("ws");
 const http = require("http");
@@ -17,6 +18,38 @@ const http = require("http");
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+// ------------------------------------------------------------
+// نظام المستخدمين البسيط (ملف JSON)
+// ------------------------------------------------------------
+const USERS_FILE = path.join(__dirname, "users.json");
+const SESSIONS_FILE = path.join(__dirname, "sessions.json");
+
+function loadUsers() {
+  try { return JSON.parse(fs.readFileSync(USERS_FILE, "utf-8")); }
+  catch { return {}; }
+}
+function saveUsers(u) { fs.writeFileSync(USERS_FILE, JSON.stringify(u, null, 2)); }
+
+function loadSessions() {
+  try { return JSON.parse(fs.readFileSync(SESSIONS_FILE, "utf-8")); }
+  catch { return {}; }
+}
+function saveSessions(s) { fs.writeFileSync(SESSIONS_FILE, JSON.stringify(s, null, 2)); }
+
+function hashPassword(p) { return crypto.createHash("sha256").update(p).digest("hex"); }
+function generateToken() { return crypto.randomBytes(32).toString("hex"); }
+
+// middleware للتحقق من الجلسة
+function requireAuth(req, res, next) {
+  const token = req.headers["x-session-token"];
+  const sessions = loadSessions();
+  if (!token || !sessions[token]) {
+    return res.status(401).json({ error: "غير مسجل الدخول" });
+  }
+  req.username = sessions[token];
+  next();
+}
 
 const server = http.createServer(app);
 
@@ -224,8 +257,138 @@ app.post("/api/trigger", (req, res) => {
   res.json({ status: "تم إرسال أمر التشغيل", overlayId });
 });
 
+// ------------------------------------------------------------
+// رابط المؤثر الخاص بكل ستريمر
+// مثال: /overlay/golden-heart?user=ahmed_live
+// هذا هو الرابط اللي يضعه الستريمر في TikTok Studio كـ Browser Source
+// ------------------------------------------------------------
+app.get("/overlay/:type", (req, res) => {
+  const { type } = req.params;
+  const { user } = req.query;
+
+  // اختيار ملف المؤثر حسب النوع
+  const overlayFiles = {
+    "golden-heart": "overlay-golden-heart.html",
+    "rose": "overlay-rose.html",
+  };
+
+  const file = overlayFiles[type];
+  if (!file) {
+    return res.status(404).send("المؤثر غير موجود");
+  }
+
+  // قراءة ملف المؤثر وحقن username مباشرة فيه
+  const filePath = path.join(__dirname, "public", file);
+  let html = fs.readFileSync(filePath, "utf-8");
+
+  // استبدال SERVER_URL بالرابط الحقيقي تلقائياً (بدون الحاجة لتعديل يدوي)
+  const serverUrl = `${req.protocol}://${req.get("host")}`;
+  html = html.replace(
+    /const SERVER_URL = ".*?";/,
+    `const SERVER_URL = "${serverUrl}"; // تم توليده تلقائياً`
+  );
+
+  // حقن username لتشغيل الاتصال تلقائياً لو أراد الستريمر
+  if (user) {
+    html = html.replace(
+      "</script>",
+      `  // username الستريمر الخاص بهذا الرابط\n  const STREAMER_USERNAME = "${user}";\n</script>`
+    );
+  }
+
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(html);
+});
+
 // ملاحظة: الصفحة الرئيسية "/" تُخدَّم تلقائيًا من public/index.html
 // (لوحة التحكم الحقيقية)، بفضل app.use(express.static(...)) في الأعلى
+
+// ------------------------------------------------------------
+// Auth endpoints
+// ------------------------------------------------------------
+
+// تسجيل حساب جديد
+app.post("/api/register", (req, res) => {
+  const { username, password, tiktokUsername } = req.body;
+  if (!username || !password || !tiktokUsername) {
+    return res.status(400).json({ error: "جميع الحقول مطلوبة" });
+  }
+  const users = loadUsers();
+  if (users[username]) {
+    return res.status(400).json({ error: "اسم المستخدم موجود مسبقاً" });
+  }
+  users[username] = {
+    password: hashPassword(password),
+    tiktokUsername,
+    createdAt: Date.now(),
+    overlayChoice: "golden-heart",
+    giftMapping: { "5655": "ov1" }
+  };
+  saveUsers(users);
+  const token = generateToken();
+  const sessions = loadSessions();
+  sessions[token] = username;
+  saveSessions(sessions);
+  res.json({ token, username, tiktokUsername });
+});
+
+// تسجيل دخول
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+  const users = loadUsers();
+  const user = users[username];
+  if (!user || user.password !== hashPassword(password)) {
+    return res.status(401).json({ error: "اسم المستخدم أو كلمة السر غلط" });
+  }
+  const token = generateToken();
+  const sessions = loadSessions();
+  sessions[token] = username;
+  saveSessions(sessions);
+  res.json({ token, username, tiktokUsername: user.tiktokUsername });
+});
+
+// تسجيل خروج
+app.post("/api/logout", requireAuth, (req, res) => {
+  const token = req.headers["x-session-token"];
+  const sessions = loadSessions();
+  delete sessions[token];
+  saveSessions(sessions);
+  res.json({ status: "تم تسجيل الخروج" });
+});
+
+// بيانات الستريمر الحالي
+app.get("/api/me", requireAuth, (req, res) => {
+  const users = loadUsers();
+  const user = users[req.username];
+  res.json({
+    username: req.username,
+    tiktokUsername: user.tiktokUsername,
+    overlayChoice: user.overlayChoice,
+    giftMapping: user.giftMapping,
+  });
+});
+
+// تحديث اختيار المؤثر
+app.post("/api/me/overlay", requireAuth, (req, res) => {
+  const { overlayId } = req.body;
+  const users = loadUsers();
+  users[req.username].overlayChoice = overlayId;
+  saveUsers(users);
+  res.json({ status: "تم التحديث" });
+});
+
+// تحديث ربط الهدايا الخاص بالستريمر
+app.post("/api/me/mapping", requireAuth, (req, res) => {
+  const { giftId, overlayId } = req.body;
+  const users = loadUsers();
+  if (overlayId === null) {
+    delete users[req.username].giftMapping[String(giftId)];
+  } else {
+    users[req.username].giftMapping[String(giftId)] = overlayId;
+  }
+  saveUsers(users);
+  res.json({ status: "تم التحديث" });
+});
 
 // ------------------------------------------------------------
 // تشغيل السيرفر
