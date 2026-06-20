@@ -1,306 +1,116 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>لوحة البث — التحكم</title>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>بثّ — مؤثرات هدايا TikTok Live</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0A0B0F;color:#EDEDED;font-family:'Tajawal',sans-serif;overflow-x:hidden}
 
-  * { box-sizing: border-box; }
+/* ===== HERO ===== */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,92,246,0.15) 0%, transparent 70%)}
 
-  body {
-    margin: 0;
-    background: #0E0F13;
-    color: #EDEDED;
-    font-family: 'Inter', system-ui, sans-serif;
-    min-height: 100vh;
-  }
+.logo{font-size:52px;font-weight:900;background:linear-gradient(135deg,#F2B84B,#8B5CF6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+.hero h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.3;margin-bottom:16px;max-width:600px}
+.hero h1 span{background:linear-gradient(135deg,#F2B84B,#E88B2E);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:17px;color:#8A8D96;max-width:480px;line-height:1.7;margin-bottom:36px}
 
-  .disp { font-family: 'Oswald', sans-serif; letter-spacing: 0.02em; }
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn-primary{background:linear-gradient(135deg,#8B5CF6,#6D3FD8);color:#fff;border:none;border-radius:12px;padding:14px 28px;font-size:16px;font-weight:700;font-family:'Tajawal';cursor:pointer;text-decoration:none;display:inline-block}
+.btn-outline{background:transparent;color:#EDEDED;border:1px solid #2A2C34;border-radius:12px;padding:14px 28px;font-size:16px;font-weight:700;font-family:'Tajawal';cursor:pointer;text-decoration:none;display:inline-block}
 
-  header {
-    border-bottom: 1px solid #1E1F26;
-    padding: 18px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
+/* preview card */
+.preview{margin-top:60px;background:#15161B;border:1px solid #1E1F26;border-radius:20px;padding:24px;max-width:340px;text-align:right}
+.preview-title{font-size:13px;color:#8B5CF6;font-weight:700;margin-bottom:12px}
+.gift-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #1E1F26}
+.gift-row:last-child{border-bottom:none}
+.gift-icon{font-size:22px}
+.gift-info{flex:1}
+.gift-name{font-size:14px;font-weight:600}
+.gift-sub{font-size:12px;color:#8A8D96}
+.gift-badge{background:#1A2A1A;border:1px solid #5FD489;color:#5FD489;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px}
 
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 19px;
-    font-weight: 700;
-  }
+/* ===== HOW IT WORKS ===== */
+.how{padding:80px 20px;max-width:900px;margin:0 auto}
+.section-title{font-size:13px;font-weight:700;color:#8B5CF6;letter-spacing:0.08em;text-align:center;margin-bottom:10px}
+.section-h{font-size:clamp(22px,4vw,32px);font-weight:800;text-align:center;margin-bottom:48px}
 
-  .logo .dot {
-    width: 34px; height: 34px; border-radius: 9px;
-    background: linear-gradient(135deg,#8B5CF6,#F2B84B);
-  }
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px}
+.step-card{background:#15161B;border:1px solid #1E1F26;border-radius:16px;padding:24px}
+.step-n{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#8B5CF6,#6D3FD8);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;margin-bottom:14px}
+.step-card h3{font-size:16px;font-weight:700;margin-bottom:8px}
+.step-card p{font-size:13px;color:#8A8D96;line-height:1.6}
 
-  nav { display: flex; gap: 6px; background: #15161B; padding: 5px; border-radius: 11px; }
+/* ===== CTA ===== */
+.cta{padding:80px 20px;text-align:center}
+.cta h2{font-size:clamp(22px,4vw,34px);font-weight:800;margin-bottom:14px}
+.cta p{color:#8A8D96;margin-bottom:28px;font-size:15px}
 
-  nav button {
-    display: flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 8px;
-    border: none; cursor: pointer; font-size: 14px; font-weight: 600; font-family: 'Inter';
-    background: transparent; color: #8A8D96; transition: all 0.15s;
-  }
-  nav button.active { background: #23242C; color: #EDEDED; }
-
-  main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
-
-  .eyebrow { font-size: 12px; font-weight: 700; color: #8B5CF6; letter-spacing: 0.08em; }
-  h1 { font-size: 26px; font-weight: 700; margin: 6px 0 8px; }
-  .desc { font-size: 14px; color: #8A8D96; margin: 0 0 24px; line-height: 1.6; max-width: 560px; }
-
-  .panel {
-    background: #15161B; border: 1px solid #1E1F26; border-radius: 14px;
-    padding: 18px 20px; margin-bottom: 16px;
-  }
-
-  .status-row { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-  .status-dot { width: 9px; height: 9px; border-radius: 50%; background: #5A5C66; }
-  .status-dot.live { background: #5FD489; box-shadow: 0 0 8px #5FD48988; }
-
-  input[type=text] {
-    background: #0E0F13; border: 1px solid #2A2C34; border-radius: 8px; padding: 10px 14px;
-    color: #EDEDED; font-size: 14px; flex: 1; min-width: 180px; font-family: 'Inter';
-  }
-  input[type=text]:focus { outline: 2px solid #8B5CF6; outline-offset: 1px; }
-
-  button.primary {
-    background: linear-gradient(135deg,#8B5CF6,#6D3FD8); color: #fff; border: none;
-    border-radius: 8px; padding: 10px 18px; font-weight: 600; cursor: pointer; font-size: 14px;
-  }
-  button.primary:disabled { opacity: 0.5; cursor: default; }
-
-  .grid { display: grid; gap: 10px; }
-
-  .row {
-    display: flex; align-items: center; gap: 14px; background: #15161B; border: 1px solid #1E1F26;
-    border-radius: 13px; padding: 13px 16px; flex-wrap: wrap;
-  }
-
-  .gift-name { font-weight: 600; font-size: 14px; min-width: 100px; }
-
-  select {
-    background: #0E0F13; border: 1px solid #2A2C34; border-radius: 8px; padding: 8px 12px;
-    color: #EDEDED; font-size: 13.5px; flex: 1; min-width: 180px; font-family: 'Inter';
-  }
-
-  .play-btn {
-    width: 38px; height: 38px; border-radius: 9px; border: none; cursor: pointer; flex-shrink: 0;
-    background: linear-gradient(135deg,#8B5CF6,#6D3FD8); display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 14px;
-  }
-
-  .toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: #23242C; border: 1px solid #2A2C34; padding: 10px 18px; border-radius: 9px;
-    font-size: 13px; opacity: 0; transition: opacity 0.3s; pointer-events: none;
-  }
-  .toast.show { opacity: 1; }
-
-  .hint { font-size: 12px; color: #5A5C66; margin-top: 4px; }
+footer{border-top:1px solid #1E1F26;padding:24px 20px;text-align:center;color:#5A5C66;font-size:13px}
 </style>
 </head>
 <body>
 
-  <header>
-    <div class="logo"><div class="dot"></div><span class="disp">لوحة البث</span></div>
-    <nav>
-      <button id="tabConnBtn" class="active">الاتصال بالبث</button>
-      <button id="tabMapBtn">ربط الهدايا</button>
-    </nav>
-  </header>
+<section class="hero">
+  <div class="logo">بثّ</div>
+  <h1>مؤثرات هدايا <span>TikTok Live</span><br/>تلقائية وفورية</h1>
+  <p>كل ما يبعث مشاهد هدية، يظهر مؤثر بصري مبدع على بثك تلقائياً — بدون أي تدخل منك وقت البث</p>
+  <div class="hero-btns">
+    <a href="register.html" class="btn-primary">ابدأ مجاناً الآن</a>
+    <a href="login.html" class="btn-outline">تسجيل الدخول</a>
+  </div>
 
-  <main>
-    <div id="connSection">
-      <span class="eyebrow">البث المباشر</span>
-      <h1 class="disp">الاتصال بحساب TikTok</h1>
-      <p class="desc">أدخل اسم المستخدم على تيكتوك وابدأ الاتصال. يجب أن يكون الستريمر مباشرًا (Live) فعليًا في تلك اللحظة لينجح الاتصال.</p>
-
-      <div class="panel">
-        <div class="status-row">
-          <div class="status-dot" id="statusDot"></div>
-          <span id="statusText">جاري التحقق من حالة الاتصال...</span>
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <input type="text" id="usernameInput" placeholder="اسم المستخدم على TikTok (بدون @)" />
-          <button class="primary" id="connectBtn">اتصال</button>
-        </div>
-        <div class="hint">عدد صفحات المؤثرات المتصلة حاليًا بالسيرفر: <span id="overlaysCount">—</span></div>
-      </div>
+  <div class="preview">
+    <div class="preview-title">⚡ مثال — هدايا مرتبطة بمؤثرات</div>
+    <div class="gift-row">
+      <div class="gift-icon">🌹</div>
+      <div class="gift-info"><div class="gift-name">وردة</div><div class="gift-sub">قلب ذهبي متفتت</div></div>
+      <div class="gift-badge">مفعّل</div>
     </div>
-
-    <div id="mapSection" style="display:none;">
-      <span class="eyebrow">الأتمتة</span>
-      <h1 class="disp">ربط الهدايا بالمؤثرات</h1>
-      <p class="desc">اختر أي مؤثر حقيقي يظهر تلقائيًا عند استلام كل هدية. الزر ▷ يرسل أمر تشغيل حقيقي لكل صفحات المؤثرات المتصلة الآن بالسيرفر.</p>
-
-      <div class="grid" id="giftsGrid"></div>
+    <div class="gift-row">
+      <div class="gift-icon">👑</div>
+      <div class="gift-info"><div class="gift-name">تاج</div><div class="gift-sub">وردة متطايرة</div></div>
+      <div class="gift-badge">مفعّل</div>
     </div>
-  </main>
+    <div class="gift-row">
+      <div class="gift-icon">⭐</div>
+      <div class="gift-info"><div class="gift-name">نجمة لامعة</div><div class="gift-sub">غير مربوطة</div></div>
+    </div>
+  </div>
+</section>
 
-  <div class="toast" id="toast"></div>
+<section class="how">
+  <div class="section-title">كيف يعمل</div>
+  <h2 class="section-h">3 خطوات وأنت جاهز</h2>
+  <div class="steps">
+    <div class="step-card">
+      <div class="step-n">1</div>
+      <h3>سجّل واختر مؤثرك</h3>
+      <p>سجّل حساب خلال دقيقة، واختر المؤثر اللي يعجبك من مكتبتنا</p>
+    </div>
+    <div class="step-card">
+      <div class="step-n">2</div>
+      <h3>انسخ الرابط لـ TikTok Studio</h3>
+      <p>رابط خاص بك جاهز — حطه في TikTok Studio كـ Browser Source بضغطة واحدة</p>
+    </div>
+    <div class="step-card">
+      <div class="step-n">3</div>
+      <h3>ابدأ البث واستمتع</h3>
+      <p>كل هدية تجيك تشغّل مؤثرها تلقائياً أمام جمهورك — أنت ما تحتاج تضغط أي شيء</p>
+    </div>
+  </div>
+</section>
 
-  <script>
-    const API = ""; // نفس الدومين (السيرفر يخدم هذه الصفحة بنفسه)
+<section class="cta">
+  <h2>جاهز تبدأ؟</h2>
+  <p>مجاني تماماً — لا تحتاج بطاقة بنكية</p>
+  <a href="register.html" class="btn-primary">ابدأ الآن مجاناً</a>
+</section>
 
-    const tabConnBtn = document.getElementById("tabConnBtn");
-    const tabMapBtn = document.getElementById("tabMapBtn");
-    const connSection = document.getElementById("connSection");
-    const mapSection = document.getElementById("mapSection");
-
-    tabConnBtn.onclick = () => switchTab("conn");
-    tabMapBtn.onclick = () => switchTab("map");
-
-    function switchTab(tab) {
-      tabConnBtn.classList.toggle("active", tab === "conn");
-      tabMapBtn.classList.toggle("active", tab === "map");
-      connSection.style.display = tab === "conn" ? "block" : "none";
-      mapSection.style.display = tab === "map" ? "block" : "none";
-      if (tab === "map") loadMapping();
-    }
-
-    function showToast(msg) {
-      const toast = document.getElementById("toast");
-      toast.textContent = msg;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2200);
-    }
-
-    // -------------------- قسم الاتصال --------------------
-    async function refreshStatus() {
-      try {
-        const res = await fetch(API + "/api/status");
-        const data = await res.json();
-        const dot = document.getElementById("statusDot");
-        const text = document.getElementById("statusText");
-        document.getElementById("overlaysCount").textContent = data.overlaysConnected;
-
-        if (data.connected) {
-          dot.classList.add("live");
-          text.textContent = "متصل ببث: " + data.username;
-        } else {
-          dot.classList.remove("live");
-          text.textContent = "لا يوجد اتصال حاليًا";
-        }
-      } catch (err) {
-        document.getElementById("statusText").textContent = "تعذّر الاتصال بالسيرفر";
-      }
-    }
-
-    document.getElementById("connectBtn").onclick = async () => {
-      const username = document.getElementById("usernameInput").value.trim();
-      if (!username) return showToast("أدخل اسم المستخدم أولًا");
-
-      const btn = document.getElementById("connectBtn");
-      btn.disabled = true;
-      btn.textContent = "جاري الاتصال...";
-
-      try {
-        const res = await fetch(API + "/api/connect", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        });
-        const data = await res.json();
-        showToast("بدأت محاولة الاتصال بـ " + username);
-        setTimeout(refreshStatus, 1500);
-      } catch (err) {
-        showToast("حدث خطأ في الاتصال بالسيرفر");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "اتصال";
-      }
-    };
-
-    // -------------------- قسم ربط الهدايا --------------------
-    let overlaysCache = [];
-    let giftsCache = [];
-    let mappingCache = {};
-
-    async function loadMapping() {
-      const grid = document.getElementById("giftsGrid");
-      grid.innerHTML = "جاري التحميل...";
-
-      try {
-        const [overlaysRes, giftsRes, mappingRes] = await Promise.all([
-          fetch(API + "/api/overlays"),
-          fetch(API + "/api/gifts"),
-          fetch(API + "/api/mapping"),
-        ]);
-        overlaysCache = await overlaysRes.json();
-        giftsCache = await giftsRes.json();
-        mappingCache = await mappingRes.json();
-
-        renderGifts();
-      } catch (err) {
-        grid.innerHTML = "تعذّر تحميل البيانات من السيرفر.";
-      }
-    }
-
-    function renderGifts() {
-      const grid = document.getElementById("giftsGrid");
-      grid.innerHTML = "";
-
-      giftsCache.forEach((gift) => {
-        const row = document.createElement("div");
-        row.className = "row";
-
-        const currentOverlay = mappingCache[String(gift.giftId)] || "";
-
-        row.innerHTML = `
-          <span class="gift-name">${gift.name}</span>
-          <select data-gift-id="${gift.giftId}">
-            <option value="">— بدون ربط —</option>
-            ${overlaysCache.map(ov =>
-              `<option value="${ov.id}" ${ov.id === currentOverlay ? "selected" : ""}>${ov.name}</option>`
-            ).join("")}
-          </select>
-          <button class="play-btn" data-trigger="${currentOverlay}">▷</button>
-        `;
-
-        const select = row.querySelector("select");
-        const playBtn = row.querySelector(".play-btn");
-
-        select.onchange = async () => {
-          const overlayId = select.value || null;
-          playBtn.dataset.trigger = overlayId || "";
-
-          await fetch(API + "/api/mapping", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ giftId: gift.giftId, overlayId }),
-          });
-          showToast("تم تحديث ربط: " + gift.name);
-        };
-
-        playBtn.onclick = async () => {
-          const overlayId = playBtn.dataset.trigger;
-          if (!overlayId) return showToast("اختر مؤثرًا أولًا لهذه الهدية");
-
-          await fetch(API + "/api/trigger", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ overlayId }),
-          });
-          showToast("تم إرسال أمر التشغيل ✓");
-        };
-
-        grid.appendChild(row);
-      });
-    }
-
-    // تحديث حالة الاتصال كل 5 ثوانٍ
-    refreshStatus();
-    setInterval(refreshStatus, 5000);
-  </script>
+<footer>بثّ © 2025 — مؤثرات TikTok Live الاحترافية</footer>
 
 </body>
 </html>
